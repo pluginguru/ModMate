@@ -129,14 +129,12 @@ bool ModMateAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 }
 #endif
 
-static MidiBuffer midiOut;
-
 void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     // the audio buffer in a midi effect will have zero channels!
     jassert(buffer.getNumChannels() == 0);
 
-    midiOut.clear();
+    MidiBuffer midiOut;
 
     MidiMessage msg;
     int samplePos;
@@ -144,19 +142,20 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     {
         if (msg.isPitchWheel())
         {
-            float pitchBendUp = 0.0f;
-            float pitchBendDown = 0.0f;
-
             int pwv = msg.getPitchWheelValue();
             if (pwv >= 8192)
             {
                 float pitchBendUp = (pwv - 8192) / 8191.0f;
-                DBG("pitchBendUp " + String(pitchBendUp));
+                int cval = int(pitchBendUp * 127 + 0.5f);
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
             }
-            else
+            if (pwv <= 8192)
             {
                 float pitchBendDown = (8192 - pwv) / 8192.0f;
-                DBG("pitchBendDown " + String(pitchBendDown));
+                int cval = int(pitchBendDown * 127 + 0.5f);
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
             }
         }
         else if (msg.isControllerOfType(1))
