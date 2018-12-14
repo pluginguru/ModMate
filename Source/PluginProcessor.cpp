@@ -216,16 +216,19 @@ AudioProcessorEditor* ModMateAudioProcessor::createEditor()
 //==============================================================================
 void ModMateAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    destData.setSize(1);
+    XmlElement xml = XmlElement("uiSize");
+    xml.setAttribute("pbUpBits", pbUp.byteValue);
+    xml.setAttribute("pbDownBits", pbDown.byteValue);
+    xml.setAttribute("wheelBits", wheel.byteValue);
+    copyXmlToBinary(xml, destData);
 }
 
 void ModMateAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    ScopedPointer<XmlElement> xml = getXmlFromBinary(data, sizeInBytes);
+    pbUp.byteValue = xml->getIntAttribute("pbUpBits", 0);
+    pbDown.byteValue = xml->getIntAttribute("pbDownBits", 0);
+    wheel.byteValue = xml->getIntAttribute("wheelBits", 0);
 }
 
 //==============================================================================
