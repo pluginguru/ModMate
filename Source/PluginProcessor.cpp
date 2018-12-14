@@ -129,33 +129,59 @@ bool ModMateAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 }
 #endif
 
+static MidiBuffer midiOut;
+
 void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    // the audio buffer in a midi effect will have zero channels!
+    jassert(buffer.getNumChannels() == 0);
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    midiOut.clear();
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    MidiMessage msg;
+    int samplePos;
+    for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, samplePos);)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        if (msg.isPitchWheel())
+        {
+            float pitchBendUp = 0.0f;
+            float pitchBendDown = 0.0f;
 
-        // ..do something to the data...
+            int pwv = msg.getPitchWheelValue();
+            if (pwv >= 8192)
+            {
+                float pitchBendUp = (pwv - 8192) / 8191.0f;
+                DBG("pitchBendUp " + String(pitchBendUp));
+            }
+            else
+            {
+                float pitchBendDown = (8192 - pwv) / 8192.0f;
+                DBG("pitchBendDown " + String(pitchBendDown));
+            }
+        }
+        else if (msg.isControllerOfType(1))
+        {
+            //float modWheel = msg.getControllerValue() / 127.0f;
+
+            int cval = msg.getControllerValue();
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+        }
+        else
+        {
+            // all other messages are passed through
+            midiOut.addEvent(msg, samplePos);
+        }
     }
+
+    int inCount = midiMessages.getNumEvents();
+    midiMessages.swapWith(midiOut);
+    int outCount = midiMessages.getNumEvents();
+
+    if (inCount != outCount)
+        DBG("in " + String(inCount) + " out " + String(outCount));
 }
 
 //==============================================================================
@@ -175,6 +201,7 @@ void ModMateAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    destData.setSize(1);
 }
 
 void ModMateAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
