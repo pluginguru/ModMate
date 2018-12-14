@@ -12,9 +12,14 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-//==============================================================================
-/**
-*/
+struct ControlBitmap
+{
+    bool cc1 : 1;
+    bool cc2 : 1;
+    bool cc4 : 1;
+    bool cc67 : 1;
+};
+
 class ModMateAudioProcessor  : public AudioProcessor
 {
 public:
@@ -54,6 +59,15 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    // MIDI inputs
+    float pitchBendUp, pitchBendDown, modWheel;
+
+    // MIDI outputs
+    float cc1, cc2, cc4, cc67;
+
+    // control matrix
+    ControlBitmap pbUpBits, pbDownBits, wheelBits;
 
 private:
     //==============================================================================

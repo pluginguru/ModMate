@@ -24,6 +24,12 @@ ModMateAudioProcessor::ModMateAudioProcessor()
                        )
 #endif
 {
+    pitchBendUp = pitchBendDown = modWheel = 0.0f;
+    cc1 = cc2 = cc4 = cc67 = 0.0f;
+
+    pbUpBits = { true, false, true, false };
+    pbDownBits = { false, true, false, true };
+    wheelBits = { false, true, true, true };
 }
 
 ModMateAudioProcessor::~ModMateAudioProcessor()
@@ -129,12 +135,14 @@ bool ModMateAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 }
 #endif
 
+static MidiBuffer midiOut;
+
 void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     // the audio buffer in a midi effect will have zero channels!
     jassert(buffer.getNumChannels() == 0);
 
-    MidiBuffer midiOut;
+    midiOut.clear();
 
     MidiMessage msg;
     int samplePos;
@@ -145,28 +153,44 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             int pwv = msg.getPitchWheelValue();
             if (pwv >= 8192)
             {
-                float pitchBendUp = (pwv - 8192) / 8191.0f;
+                pitchBendUp = (pwv - 8192) / 8191.0f;
                 int cval = int(pitchBendUp * 127 + 0.5f);
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
+                if (pbUpBits.cc1)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
+                if (pbUpBits.cc2)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
+                if (pbUpBits.cc4)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
+                if (pbUpBits.cc67)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
             }
-            if (pwv <= 8192)
+            else
             {
-                float pitchBendDown = (8192 - pwv) / 8192.0f;
+                pitchBendDown = (8192 - pwv) / 8192.0f;
                 int cval = int(pitchBendDown * 127 + 0.5f);
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+                if (pbDownBits.cc1)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
+                if (pbDownBits.cc2)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
+                if (pbDownBits.cc4)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
+                if (pbDownBits.cc67)
+                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
             }
         }
         else if (msg.isControllerOfType(1))
         {
-            //float modWheel = msg.getControllerValue() / 127.0f;
+            modWheel = msg.getControllerValue() / 127.0f;
 
             int cval = msg.getControllerValue();
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+            if (wheelBits.cc1)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
+            if (wheelBits.cc2)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
+            if (wheelBits.cc4)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
+            if (wheelBits.cc67)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
         }
         else
         {
@@ -175,12 +199,7 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
         }
     }
 
-    int inCount = midiMessages.getNumEvents();
     midiMessages.swapWith(midiOut);
-    int outCount = midiMessages.getNumEvents();
-
-    if (inCount != outCount)
-        DBG("in " + String(inCount) + " out " + String(outCount));
 }
 
 //==============================================================================
