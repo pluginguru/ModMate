@@ -27,9 +27,9 @@ ModMateAudioProcessor::ModMateAudioProcessor()
     pitchBendUp = pitchBendDown = modWheel = 0.0f;
     cc1 = cc2 = cc4 = cc67 = 0.0f;
 
-    pbUpBits = { true, false, true, false };
-    pbDownBits = { false, true, false, true };
-    wheelBits = { false, true, true, true };
+    pbUp.bits = { true, false, true, false };
+    pbDown.bits = { false, true, false, true };
+    wheel.bits = { false, true, true, true };
 }
 
 ModMateAudioProcessor::~ModMateAudioProcessor()
@@ -155,26 +155,26 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             {
                 pitchBendUp = (pwv - 8192) / 8191.0f;
                 int cval = int(pitchBendUp * 127 + 0.5f);
-                if (pbUpBits.cc1)
+                if (pbUp.bits.cc1)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-                if (pbUpBits.cc2)
+                if (pbUp.bits.cc2)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-                if (pbUpBits.cc4)
+                if (pbUp.bits.cc4)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-                if (pbUpBits.cc67)
+                if (pbUp.bits.cc67)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
             }
             else
             {
                 pitchBendDown = (8192 - pwv) / 8192.0f;
                 int cval = int(pitchBendDown * 127 + 0.5f);
-                if (pbDownBits.cc1)
+                if (pbDown.bits.cc1)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-                if (pbDownBits.cc2)
+                if (pbDown.bits.cc2)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-                if (pbDownBits.cc4)
+                if (pbDown.bits.cc4)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-                if (pbDownBits.cc67)
+                if (pbDown.bits.cc67)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
             }
         }
@@ -183,13 +183,13 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             modWheel = msg.getControllerValue() / 127.0f;
 
             int cval = msg.getControllerValue();
-            if (wheelBits.cc1)
+            if (wheel.bits.cc1)
                 midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-            if (wheelBits.cc2)
+            if (wheel.bits.cc2)
                 midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-            if (wheelBits.cc4)
+            if (wheel.bits.cc4)
                 midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-            if (wheelBits.cc67)
+            if (wheel.bits.cc67)
                 midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
         }
         else

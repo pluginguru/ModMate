@@ -14,10 +14,16 @@
 
 struct ControlBitmap
 {
-    bool cc1 : 1;
-    bool cc2 : 1;
-    bool cc4 : 1;
-    bool cc67 : 1;
+    union {
+        struct {
+            bool cc1 : 1;
+            bool cc2 : 1;
+            bool cc4 : 1;
+            bool cc67 : 1;
+            int padding : 4;
+        } bits;
+        int byteValue : 8;
+    };
 };
 
 class ModMateAudioProcessor  : public AudioProcessor
@@ -67,7 +73,7 @@ public:
     float cc1, cc2, cc4, cc67;
 
     // control matrix
-    ControlBitmap pbUpBits, pbDownBits, wheelBits;
+    ControlBitmap pbUp, pbDown, wheel;
 
 private:
     //==============================================================================
