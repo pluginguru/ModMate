@@ -8,6 +8,10 @@
               pluginCode="ModM">
   <MAINGROUP id="L9muth" name="ModMate">
     <GROUP id="{9D85C991-EAC0-DE48-0358-2E64E564E3C1}" name="Source">
+      <FILE id="g5KCWY" name="UnidirectionalSlider.cpp" compile="1" resource="0"
+            file="Source/UnidirectionalSlider.cpp"/>
+      <FILE id="L2bykK" name="UnidirectionalSlider.h" compile="0" resource="0"
+            file="Source/UnidirectionalSlider.h"/>
       <FILE id="VfZh7H" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="j5HBLM" name="PluginProcessor.h" compile="0" resource="0"

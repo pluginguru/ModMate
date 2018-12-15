@@ -1,17 +1,6 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-//==============================================================================
 ModMateAudioProcessor::ModMateAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
@@ -36,7 +25,6 @@ ModMateAudioProcessor::~ModMateAudioProcessor()
 {
 }
 
-//==============================================================================
 const String ModMateAudioProcessor::getName() const
 {
     return JucePlugin_Name;
@@ -98,7 +86,6 @@ void ModMateAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
-//==============================================================================
 void ModMateAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
@@ -202,7 +189,6 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     midiMessages.swapWith(midiOut);
 }
 
-//==============================================================================
 bool ModMateAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
@@ -213,7 +199,6 @@ AudioProcessorEditor* ModMateAudioProcessor::createEditor()
     return new ModMateAudioProcessorEditor (*this);
 }
 
-//==============================================================================
 void ModMateAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     XmlElement xml = XmlElement("uiSize");
@@ -231,8 +216,6 @@ void ModMateAudioProcessor::setStateInformation (const void* data, int sizeInByt
     wheel.byteValue = xml->getIntAttribute("wheelBits", 0);
 }
 
-//==============================================================================
-// This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ModMateAudioProcessor();
