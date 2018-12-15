@@ -13,6 +13,7 @@ For the very best experience, you should use a hardware MIDI controller which pr
 
 ## Using the ModMate plug-in
 ![](modmate.png)
+
 The four large rectangles on the right of the GUI show the output levels for MIDI CC's 1, 2, 4, and 67 (top to bottom). The three narrow vertical rectangles on the left show the input levels (from your MIDI controller) for pitch-bend up (pbUp), pitch-bend down (pbDn), and mod wheel (modW). To the right of each of these indicator strips are four checkboxes; checking any box connects that input to the corresponding CC output. Try it; it's easier to use than to explain.
 
 If your DAW supports it, your selections on the 12 checkboxes can be saved as a preset, and will normally be saved automatically as part of the track settings in a saved project. This has been tested with the Mac AU version in *Logic Pro X* and with the VST version in [Reaper](https://www.reaper.fm/index.php) 64-bit.
