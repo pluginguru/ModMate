@@ -144,7 +144,7 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, samplePos);)
     {
         bool somethingChanged = false;
-        if (msg.isPitchWheel())
+        if (msg.isPitchWheel() && (pbDown.byteValue || pbUp.byteValue))
         {
             int pwv = msg.getPitchWheelValue();
             if (pwv >= 8192)
@@ -195,7 +195,7 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             }
             somethingChanged = true;
         }
-        else if (msg.isControllerOfType(1))
+        else if (msg.isControllerOfType(1) && wheel.byteValue)
         {
             modWheel = msg.getControllerValue() / 127.0f;
             if (wheel.bits.cc1) CC1 = modWheel;
