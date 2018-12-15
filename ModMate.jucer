@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="qHN5wZ" name="ModMate" projectType="audioplug" jucerVersion="5.4.1"
-              companyName="Shane Dunne and Associates Inc" reportAppUsage="0"
-              displaySplashScreen="0" bundleIdentifier="com.getdunne.ModMate"
-              pluginFormats="buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
+              companyName="Shane Dunne" reportAppUsage="0" displaySplashScreen="0"
+              bundleIdentifier="com.getdunne.ModMate" pluginFormats="buildAU,buildVST,buildVST3"
+              pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginDesc="Midi CC macro plugin" pluginManufacturerCode="DunA"
               pluginCode="ModM">
   <MAINGROUP id="L9muth" name="ModMate">
