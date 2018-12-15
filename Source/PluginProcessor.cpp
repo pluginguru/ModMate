@@ -150,6 +150,7 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
                 if (pbUp.bits.cc67)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+                sendChangeMessage();
             }
             else
             {
@@ -163,6 +164,7 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
                 if (pbDown.bits.cc67)
                     midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+                sendChangeMessage();
             }
         }
         else if (msg.isControllerOfType(1))
@@ -178,6 +180,7 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
                 midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
             if (wheel.bits.cc67)
                 midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+            sendChangeMessage();
         }
         else
         {
@@ -201,7 +204,7 @@ AudioProcessorEditor* ModMateAudioProcessor::createEditor()
 
 void ModMateAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    XmlElement xml = XmlElement("uiSize");
+    XmlElement xml = XmlElement("modBits");
     xml.setAttribute("pbUpBits", pbUp.byteValue);
     xml.setAttribute("pbDownBits", pbDown.byteValue);
     xml.setAttribute("wheelBits", wheel.byteValue);

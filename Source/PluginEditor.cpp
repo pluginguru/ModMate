@@ -11,17 +11,6 @@ ModMateAudioProcessorEditor::ModMateAudioProcessorEditor (ModMateAudioProcessor&
     , cc4Slider(Colours::cyan)
     , cc67Slider(Colours::greenyellow)
 {
-    pitchBendUp = processor.pitchBendUp;
-    pitchBendDown = processor.pitchBendDown;
-    modWheel = processor.modWheel;
-    cc1 = processor.cc1;
-    cc2 = processor.cc2;
-    cc4 = processor.cc4;
-    cc67 = processor.cc67;
-    pbUp = processor.pbUp;
-    pbDown = processor.pbDown;
-    wheel = processor.wheel;
-
     addAndMakeVisible(pbUpLabel);
     pbUpLabel.setJustificationType(Justification::left);
     pbUpLabel.setText("pbUp", NotificationType::dontSendNotification);
@@ -55,6 +44,11 @@ ModMateAudioProcessorEditor::ModMateAudioProcessorEditor (ModMateAudioProcessor&
     addAndMakeVisible(modW_cc2Btn);
     addAndMakeVisible(modW_cc4Btn);
     addAndMakeVisible(modW_cc67Btn);
+    
+    pitchBendUp = pitchBendDown = modWheel = -1.0f;
+    cc1 = cc2 = cc4 = cc67 = -1.0f;
+    pbUp.byteValue = pbDown.byteValue = wheel.byteValue = -1;
+    changeListenerCallback(nullptr);
 
     processor.addChangeListener(this);
 
@@ -116,52 +110,61 @@ void ModMateAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
 {
     if (pitchBendUp != processor.pitchBendUp)
     {
-
         pitchBendUp = processor.pitchBendUp;
+        pbUpSlider.setValue(pitchBendUp);
     }
     if (pitchBendDown != processor.pitchBendDown)
     {
-
         pitchBendDown = processor.pitchBendDown;
+        pbDownSlider.setValue(pitchBendDown);
     }
     if (modWheel != processor.modWheel)
     {
-
         modWheel = processor.modWheel;
+        modWheelSlider.setValue(modWheel);
     }
     if (cc1 != processor.cc1)
     {
-
         cc1 = processor.cc1;
+        cc1Slider.setValue(cc1);
     }
     if (cc2 != processor.cc2)
     {
-
         cc2= processor.cc2;
+        cc2Slider.setValue(cc2);
     }
     if (cc4 != processor.cc4)
     {
-
         cc4 = processor.cc4;
+        cc4Slider.setValue(cc4);
     }
     if (cc67 != processor.cc67)
     {
-
         cc67 = processor.cc67;
+        cc67Slider.setValue(cc67);
     }
     if (pbUp.byteValue != processor.pbUp.byteValue)
     {
-
         pbUp.byteValue = processor.pbUp.byteValue;
+        pbUp_cc1Btn.setToggleState(pbUp.bits.cc1, NotificationType::dontSendNotification);
+        pbUp_cc2Btn.setToggleState(pbUp.bits.cc2, NotificationType::dontSendNotification);
+        pbUp_cc4Btn.setToggleState(pbUp.bits.cc4, NotificationType::dontSendNotification);
+        pbUp_cc67Btn.setToggleState(pbUp.bits.cc67, NotificationType::dontSendNotification);
     }
     if (pbDown.byteValue != processor.pbDown.byteValue)
     {
-
         pbDown.byteValue = processor.pbDown.byteValue;
+        pbDn_cc1Btn.setToggleState(pbDown.bits.cc1, NotificationType::dontSendNotification);
+        pbDn_cc2Btn.setToggleState(pbDown.bits.cc2, NotificationType::dontSendNotification);
+        pbDn_cc4Btn.setToggleState(pbDown.bits.cc4, NotificationType::dontSendNotification);
+        pbDn_cc67Btn.setToggleState(pbDown.bits.cc67, NotificationType::dontSendNotification);
     }
     if (wheel.byteValue != processor.wheel.byteValue)
     {
-
         wheel.byteValue = processor.wheel.byteValue;
+        modW_cc1Btn.setToggleState(wheel.bits.cc1, NotificationType::dontSendNotification);
+        modW_cc2Btn.setToggleState(wheel.bits.cc2, NotificationType::dontSendNotification);
+        modW_cc4Btn.setToggleState(wheel.bits.cc4, NotificationType::dontSendNotification);
+        modW_cc67Btn.setToggleState(wheel.bits.cc67, NotificationType::dontSendNotification);
     }
 }
