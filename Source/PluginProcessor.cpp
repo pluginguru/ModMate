@@ -16,9 +16,12 @@ ModMateAudioProcessor::ModMateAudioProcessor()
     pitchBendUp = pitchBendDown = modWheel = 0.0f;
     cc1 = cc2 = cc4 = cc67 = 0.0f;
 
-    pbUp.bits = { true, false, true, false };
-    pbDown.bits = { false, true, false, true };
-    wheel.bits = { false, true, true, true };
+    //pbUp.bits = { true, false, true, false };
+    //pbDown.bits = { false, true, false, true };
+    //wheel.bits = { false, true, true, true };
+    pbUp.byteValue = 0;
+    pbDown.byteValue = 0;
+    wheel.byteValue = 0;
 }
 
 ModMateAudioProcessor::~ModMateAudioProcessor()
@@ -130,63 +133,112 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     jassert(buffer.getNumChannels() == 0);
 
     midiOut.clear();
+    
+    float CC1 = cc1;
+    float CC2 = cc2;
+    float CC4 = cc4;
+    float CC67 = cc67;
 
     MidiMessage msg;
     int samplePos;
     for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, samplePos);)
     {
+        bool somethingChanged = false;
         if (msg.isPitchWheel())
         {
             int pwv = msg.getPitchWheelValue();
             if (pwv >= 8192)
             {
                 pitchBendUp = (pwv - 8192) / 8191.0f;
-                int cval = int(pitchBendUp * 127 + 0.5f);
-                if (pbUp.bits.cc1)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-                if (pbUp.bits.cc2)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-                if (pbUp.bits.cc4)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-                if (pbUp.bits.cc67)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
-                sendChangeMessage();
+                bool pbdWas0 = (pitchBendDown == 0.0f);
+                pitchBendDown = 0.0f;
+                if (!pbdWas0)
+                {
+                    if (pbDown.bits.cc1)
+                    {
+                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, 0), samplePos);
+                        CC1 = 0.0f;
+                        somethingChanged = true;
+                    }
+                    if (pbDown.bits.cc2)
+                    {
+                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, 0), samplePos);
+                        CC2 = 0.0f;
+                        somethingChanged = true;
+                    }
+                    if (pbDown.bits.cc4)
+                    {
+                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, 0), samplePos);
+                        CC4 = 0.0f;
+                        somethingChanged = true;
+                    }
+                    if (pbDown.bits.cc67)
+                    {
+                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, 0), samplePos);
+                        CC67 = 0.0f;
+                        somethingChanged = true;
+                    }
+                }
+                if (pbUp.bits.cc1) CC1 = pitchBendUp;
+                if (pbUp.bits.cc2) CC2 = pitchBendUp;
+                if (pbUp.bits.cc4) CC4 = pitchBendUp;
+                if (pbUp.bits.cc67) CC67 = pitchBendUp;
             }
-            else
+            else if (pwv < 8192)
             {
-                pitchBendDown = (8192 - pwv) / 8192.0f;
-                int cval = int(pitchBendDown * 127 + 0.5f);
-                if (pbDown.bits.cc1)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-                if (pbDown.bits.cc2)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-                if (pbDown.bits.cc4)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-                if (pbDown.bits.cc67)
-                    midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
-                sendChangeMessage();
+                pitchBendDown = (8192 - pwv) / 8191.0f;
+                pitchBendUp = 0.0f;
+                if (pbDown.bits.cc1) CC1 = pitchBendDown;
+                if (pbDown.bits.cc2) CC2 = pitchBendDown;
+                if (pbDown.bits.cc4) CC4 = pitchBendDown;
+                if (pbDown.bits.cc67) CC67 = pitchBendDown;
             }
+            somethingChanged = true;
         }
         else if (msg.isControllerOfType(1))
         {
             modWheel = msg.getControllerValue() / 127.0f;
-
-            int cval = msg.getControllerValue();
-            if (wheel.bits.cc1)
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
-            if (wheel.bits.cc2)
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
-            if (wheel.bits.cc4)
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
-            if (wheel.bits.cc67)
-                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
-            sendChangeMessage();
+            if (wheel.bits.cc1) CC1 = modWheel;
+            if (wheel.bits.cc2) CC2 = modWheel;
+            if (wheel.bits.cc4) CC4 = modWheel;
+            if (wheel.bits.cc67) CC67 = modWheel;
+            somethingChanged = true;
         }
         else
         {
             // all other messages are passed through
             midiOut.addEvent(msg, samplePos);
         }
+        
+        if (CC1 != cc1)
+        {
+            cc1 = CC1;
+            int cval = int(cc1 * 127 + 0.5f);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 1, cval), samplePos);
+            somethingChanged = true;
+        }
+        if (CC2 != cc2)
+        {
+            cc2 = CC2;
+            int cval = int(cc2 * 127 + 0.5f);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 2, cval), samplePos);
+            somethingChanged = true;
+        }
+        if (CC4 != cc4)
+        {
+            cc4 = CC4;
+            int cval = int(cc4 * 127 + 0.5f);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 4, cval), samplePos);
+            somethingChanged = true;
+        }
+        if (CC67 != cc67)
+        {
+            cc67 = CC67;
+            int cval = int(cc67 * 127 + 0.5f);
+            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), 67, cval), samplePos);
+            somethingChanged = true;
+        }
+        if (somethingChanged) sendChangeMessage();
     }
 
     midiMessages.swapWith(midiOut);

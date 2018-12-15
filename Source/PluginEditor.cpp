@@ -51,7 +51,22 @@ ModMateAudioProcessorEditor::ModMateAudioProcessorEditor (ModMateAudioProcessor&
     changeListenerCallback(nullptr);
 
     processor.addChangeListener(this);
+    
+    pbUp_cc1Btn.addListener(this);
+    pbUp_cc2Btn.addListener(this);
+    pbUp_cc4Btn.addListener(this);
+    pbUp_cc67Btn.addListener(this);
 
+    pbDn_cc1Btn.addListener(this);
+    pbDn_cc2Btn.addListener(this);
+    pbDn_cc4Btn.addListener(this);
+    pbDn_cc67Btn.addListener(this);
+    
+    modW_cc1Btn.addListener(this);
+    modW_cc2Btn.addListener(this);
+    modW_cc4Btn.addListener(this);
+    modW_cc67Btn.addListener(this);
+    
     setSize (400, 300);
 }
 
@@ -167,4 +182,22 @@ void ModMateAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
         modW_cc4Btn.setToggleState(wheel.bits.cc4, NotificationType::dontSendNotification);
         modW_cc67Btn.setToggleState(wheel.bits.cc67, NotificationType::dontSendNotification);
     }
+}
+
+void ModMateAudioProcessorEditor::buttonClicked(Button* button)
+{
+    if (button == &pbUp_cc1Btn) pbUp.bits.cc1 = processor.pbUp.bits.cc1 = button->getToggleState();
+    if (button == &pbUp_cc2Btn) pbUp.bits.cc2 = processor.pbUp.bits.cc2 = button->getToggleState();
+    if (button == &pbUp_cc4Btn) pbUp.bits.cc4 = processor.pbUp.bits.cc4 = button->getToggleState();
+    if (button == &pbUp_cc67Btn) pbUp.bits.cc67 = processor.pbUp.bits.cc67 = button->getToggleState();
+
+    if (button == &pbDn_cc1Btn) pbDown.bits.cc1 = processor.pbDown.bits.cc1 = button->getToggleState();
+    if (button == &pbDn_cc2Btn) pbDown.bits.cc2 = processor.pbDown.bits.cc2 = button->getToggleState();
+    if (button == &pbDn_cc4Btn) pbDown.bits.cc4 = processor.pbDown.bits.cc4 = button->getToggleState();
+    if (button == &pbDn_cc67Btn) pbDown.bits.cc67 = processor.pbDown.bits.cc67 = button->getToggleState();
+
+    if (button == &modW_cc1Btn) wheel.bits.cc1 = processor.wheel.bits.cc1 = button->getToggleState();
+    if (button == &modW_cc2Btn) wheel.bits.cc2 = processor.wheel.bits.cc2 = button->getToggleState();
+    if (button == &modW_cc4Btn) wheel.bits.cc4 = processor.wheel.bits.cc4 = button->getToggleState();
+    if (button == &modW_cc67Btn) wheel.bits.cc67 = processor.wheel.bits.cc67 = button->getToggleState();
 }

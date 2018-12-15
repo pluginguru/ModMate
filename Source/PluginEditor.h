@@ -6,6 +6,7 @@
 
 class ModMateAudioProcessorEditor   : public AudioProcessorEditor
                                     , public ChangeListener
+                                    , public Button::Listener
 {
 public:
     ModMateAudioProcessorEditor (ModMateAudioProcessor&);
@@ -17,6 +18,9 @@ public:
 
     // ChangeListener
     void changeListenerCallback(ChangeBroadcaster*) override;
+    
+    // Button::Listener
+    void buttonClicked(Button*) override;
 
 private:
     ModMateAudioProcessor& processor;
