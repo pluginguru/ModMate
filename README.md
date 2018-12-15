@@ -22,8 +22,10 @@ This is *free, open-source software*. You can build it yourself from the source 
 
 If you can't or don't want to build these plug-ins from source, pre-built version are available at http://getdunne.net/download/modmate.
 
-## Installing and the AU version on a Mac
-Copy the file *ModMate.component* to the your *~/Library/Audio/Plug-Ins/Components*. On recent versions of macOS you **must** log-out and then back in again (or restart your Mac) before the ModMate plug-in will show up in DAWs such as *Logic Pro X*.
+## Installing and using on a Mac
+**Audio Unit version:** Copy the file *ModMate.component* to the your *~/Library/Audio/Plug-Ins/Components*. On recent versions of macOS you **must** log-out and then back in again (or restart your Mac) before the ModMate plug-in will show up in DAWs such as *Logic Pro X*.
+
+**VST and VST3:** If your DAW requires VST plug-ins, copy the file *ModMate.vst* to *~/Library/Audio/Plug-Ins/VST* and/or the file *ModMate.vst3* to *~/Library/Audio/Plug-Ins/VST3*, then restart your Mac before opening your DAW.
 
 ## Installing and using the VST versions on a Windows PC
 Copy the appropriate *.dll* (VST2) or *.vst3* file to whatever folder your DAW uses to find plug-ins. Windows DAWs vary a lot; refer to the manual for your specific DAW. If your DAW is 64-bit (nearly all recent ones are), use a 64-bit version of the plug-in; use the 32-bit version only if your DAW is an older 32-bit program.
