@@ -7,6 +7,9 @@
               pluginDesc="Midi CC macro plugin" pluginManufacturerCode="DunA"
               pluginCode="ModM">
   <MAINGROUP id="L9muth" name="ModMate">
+    <GROUP id="{85081013-E4D9-CF97-EDAE-D152456D7973}" name="Assets">
+      <FILE id="zHUSB2" name="help.svg" compile="0" resource="1" file="Assets/help.svg"/>
+    </GROUP>
     <GROUP id="{9D85C991-EAC0-DE48-0358-2E64E564E3C1}" name="Source">
       <FILE id="g5KCWY" name="UnidirectionalSlider.cpp" compile="1" resource="0"
             file="Source/UnidirectionalSlider.cpp"/>

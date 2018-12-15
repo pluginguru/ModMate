@@ -26,6 +26,7 @@ private:
     ModMateAudioProcessor& processor;
 
     // Controls
+    DrawableButton aboutButton;
     Label pbUpLabel, pbDownLabel, modWheelLabel;
     UnidirectionalSlider pbUpSlider, pbDownSlider, modWheelSlider;
     UnidirectionalSlider cc1Slider, cc2Slider, cc4Slider, cc67Slider;

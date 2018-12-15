@@ -1,8 +1,9 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-ModMateAudioProcessorEditor::ModMateAudioProcessorEditor (ModMateAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+ModMateAudioProcessorEditor::ModMateAudioProcessorEditor(ModMateAudioProcessor& p)
+    : AudioProcessorEditor(&p), processor(p)
+    , aboutButton(String("aboutBtn"), DrawableButton::ButtonStyle::ImageFitted)
     , pbUpSlider(Colours::lime)
     , pbDownSlider(Colours::red)
     , modWheelSlider(Colours::darkorange)
@@ -11,6 +12,15 @@ ModMateAudioProcessorEditor::ModMateAudioProcessorEditor (ModMateAudioProcessor&
     , cc4Slider(Colours::cyan)
     , cc67Slider(Colours::greenyellow)
 {
+    std::unique_ptr<Drawable> icon(Drawable::createFromImageData(BinaryData::help_svg, BinaryData::help_svgSize));
+    icon->replaceColour(Colours::black, Colours::aliceblue);
+    aboutButton.setImages(icon.get());
+    addAndMakeVisible(aboutButton);
+    aboutButton.onClick = [this] {
+        URL url("https://github.com/getdunne/modmate");
+        url.launchInDefaultBrowser();
+    };
+
     addAndMakeVisible(pbUpLabel);
     pbUpLabel.setJustificationType(Justification::left);
     pbUpLabel.setText("pbUp", NotificationType::dontSendNotification);
@@ -83,8 +93,10 @@ void ModMateAudioProcessorEditor::paint (Graphics& g)
 
 void ModMateAudioProcessorEditor::resized()
 {
-    auto bounds = getLocalBounds().reduced(10);
+    auto aboutBox = getLocalBounds().reduced(6).removeFromTop(24).removeFromRight(24);
+    aboutButton.setBounds(aboutBox);
 
+    auto bounds = getLocalBounds().reduced(10);
     auto column = bounds.removeFromLeft(50);
     pbUpLabel.setBounds(column.removeFromTop(20));
     pbUpSlider.setBounds(column.removeFromLeft(20));
