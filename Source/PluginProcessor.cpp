@@ -269,6 +269,7 @@ void ModMateAudioProcessor::setStateInformation (const void* data, int sizeInByt
     pbUp.byteValue = xml->getIntAttribute("pbUpBits", 0);
     pbDown.byteValue = xml->getIntAttribute("pbDownBits", 0);
     wheel.byteValue = xml->getIntAttribute("wheelBits", 0);
+    sendChangeMessage();
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
