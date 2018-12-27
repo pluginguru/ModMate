@@ -14,7 +14,7 @@ For the very best experience, you should use a hardware MIDI controller which pr
 ## Using the ModMate plug-in (basic)
 ![](modmate.png)
 
-The four large rectangles on the right of the GUI show the output levels for MIDI CC's 1, 2, 4, and 67 (top to bottom). The six narrow vertical rectangles on the left show the input levels (from your MIDI controller) for pitch-bend up (pbUp), pitch-bend down (pbDn), and mod wheel (modW), as well as MIDI CCs 2, 4, and 67 (your MIDI controller may not have these CCs). To the right of each of these indicator strips are four checkboxes; checking any box connects that input to the corresponding CC output. Try it; it's easier to use than to explain.
+The four large rectangles on the right of the GUI show the output levels for MIDI CC's 1, 2, 4, and 67 (top to bottom). The six narrow vertical rectangles on the left show the input levels (from your MIDI controller) for pitch-bend up (pbUp), pitch-bend down (pbDn), and mod wheel (modW), as well as MIDI CCs 2, 4, and 67 (ignore these if your MIDI controller has only pitch and mod wheels). To the right of each of these indicator strips are four checkboxes; checking any box connects that input to the corresponding CC output. Try it; it's easier to use than to explain.
 
 If you don't check any of an input control's four destination boxes, the control's data will be passed through the plug-in unchanged, so you can use that control normally.
 
