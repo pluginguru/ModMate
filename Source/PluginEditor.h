@@ -22,6 +22,13 @@ public:
     // Button::Listener
     void buttonClicked(Button*) override;
 
+protected:
+    void onModWheelLabelTextChange();
+    void onCC1LabelTextChange();
+    void onCC2LabelTextChange();
+    void onCC4LabelTextChange();
+    void onCC67LabelTextChange();
+
 private:
     ModMateAudioProcessor& processor;
 
@@ -29,6 +36,7 @@ private:
     DrawableButton aboutButton;
     Label pbUpLabel, pbDownLabel, modWheelLabel;
     UnidirectionalSlider pbUpSlider, pbDownSlider, modWheelSlider;
+    Label cc1Label, cc2Label, cc4Label, cc67Label;
     UnidirectionalSlider cc1Slider, cc2Slider, cc4Slider, cc67Slider;
     ToggleButton pbUp_cc1Btn, pbUp_cc2Btn, pbUp_cc4Btn, pbUp_cc67Btn;
     ToggleButton pbDn_cc1Btn, pbDn_cc2Btn, pbDn_cc4Btn, pbDn_cc67Btn;

@@ -50,6 +50,14 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void pbUpChange(float ccVal);
+    void pbDownChange(float ccVal);
+    void modWheelChange(float ccVal);
+    void cc1Change(float ccVal);
+    void cc2Change(float ccVal);
+    void cc4Change(float ccVal);
+    void cc67Change(float ccVal);
+
     // MIDI inputs
     float pitchBendUp, pitchBendDown, modWheel;
 
@@ -58,7 +66,13 @@ public:
 
     // control matrix
     ControlBitmap pbUp, pbDown, wheel;
+    int cc1In;
+    int cc1Out, cc2Out, cc4Out, cc67Out;
+    bool presetLoaded;
 
 private:
+    bool pbUpChanged, pbDownChanged, modWheelChanged;
+    bool cc1Changed, cc2Changed, cc4Changed, cc67Changed;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModMateAudioProcessor)
 };

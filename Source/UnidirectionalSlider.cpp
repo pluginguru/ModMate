@@ -30,6 +30,29 @@ void UnidirectionalSlider::paint (Graphics& g)
     g.drawRect(area);
 }
 
+void UnidirectionalSlider::mouseDrag(const MouseEvent& evt)
+{
+    float fv = (getWidth() > getHeight())
+                ? evt.getPosition().getX() / float(getWidth())
+                : 1.0f - evt.getPosition().getY() / float(getHeight());
+    if (fv < 0.0f) fv = 0.0f;
+    if (fv > 1.0f) fv = 1.0f;
+    if (value != fv)
+    {
+        value = fv;
+        repaint();
+        sendChangeMessage();
+    }
+}
+
+void UnidirectionalSlider::mouseUp(const MouseEvent&)
+{
+    value = 0.0f;
+    repaint();
+    sendChangeMessage();
+}
+
+
 void UnidirectionalSlider::setValue(float v)
 {
     value = v;
