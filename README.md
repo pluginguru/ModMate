@@ -11,14 +11,25 @@ The *Airwave V3* sound libraries are unique in that four distinct MIDI CCs (cont
 
 For the very best experience, you should use a hardware MIDI controller which provides multiple MIDI CCs, preferably in the form of touch sliders, as on the excellent [Maschine JAM](https://www.native-instruments.com/en/products/maschine/production-systems/maschine-jam/), or [Sonic Logic 3 for iPad](https://www.soniclogicapps.com/). For people who are not yet ready or able to buy these very nice hardware MIDI systems, I created this very simple plug-in, which lets you at least get started with *Airwave V3*, using just the standard controls available on nearly all MIDI keyboards: pitch bend and mod wheel.
 
-## Using the ModMate plug-in
+## Using the ModMate plug-in (basic)
 ![](modmate.png)
 
-The four large rectangles on the right of the GUI show the output levels for MIDI CC's 1, 2, 4, and 67 (top to bottom). The three narrow vertical rectangles on the left show the input levels (from your MIDI controller) for pitch-bend up (pbUp), pitch-bend down (pbDn), and mod wheel (modW). To the right of each of these indicator strips are four checkboxes; checking any box connects that input to the corresponding CC output. Try it; it's easier to use than to explain.
+The four large rectangles on the right of the GUI show the output levels for MIDI CC's 1, 2, 4, and 67 (top to bottom). The six narrow vertical rectangles on the left show the input levels (from your MIDI controller) for pitch-bend up (pbUp), pitch-bend down (pbDn), and mod wheel (modW), as well as MIDI CCs 2, 4, and 67 (your MIDI controller may not have these CCs). To the right of each of these indicator strips are four checkboxes; checking any box connects that input to the corresponding CC output. Try it; it's easier to use than to explain.
 
 If you don't check any of an input control's four destination boxes, the control's data will be passed through the plug-in unchanged, so you can use that control normally.
 
-If your DAW supports it, your selections on the 12 checkboxes can be saved as a preset, and will normally be saved automatically as part of the track settings in a saved project. This has been tested with the Mac AU version in *Logic Pro X* and with the VST version in [Reaper](https://www.reaper.fm/index.php) 64-bit.
+If your DAW supports it, your selections on all the checkboxes can be saved as a preset, and will normally be saved automatically as part of the track settings in a saved project. This has been tested with the Mac AU version in *Logic Pro X* and with the VST version in [Reaper](https://www.reaper.fm/index.php) 64-bit.
+
+## Advanced features
+You can click/drag in any of the vertical indicators on the left, and the plug-in will respond as though you had operated the corresponding input CC, and will generate CC output messages for whichever output CCs are checked for that input. You can also click/drag in any of the horizontal indicators on the right, and the plug-in will generate the corresponding output CC messages. In both cases, the indicator (and CC output) will snap back to zero when you release the mouse button.
+
+You can double-click any of the *colored* slider labels (not *pbUp* or *pbDn*) to change the corresponding MIDI CC number. You may type any number between 1 and 127; you don't have to put "cc" at the start, but it's OK if you do. You must press *Enter* to confirm the change. Note CC#1 will always display as "modW" because MIDI CC #1 *is* the standard mod wheel.
+
+If you have a MIDI controller with knobs or sliders pre-assigned to MIDI CC numbers other than those used by the *Airwave V3* libraries, you'll want to change the *input* CC numbers along the top of the plug-in window, to whatever CC's your controller outputs.
+
+If you're using *ModMate* with an software instrument or library which is set up to respond to MIDI CCs other than what the *Airwave V3* libraries use, you'll want to change the *output* CC numbers to the left of each large horizontal indicator.
+
+If your DAW supports it, your MIDI CC assignments can be saved/restored in presets, along with the checkbox settings.
 
 ## Obtaining the plug-in
 This is *free, open-source software*. You can build it yourself from the source code here; see below under Acknowledgements.
