@@ -53,25 +53,28 @@ public:
     void pbUpChange(float ccVal);
     void pbDownChange(float ccVal);
     void modWheelChange(float ccVal);
+    void wheel2Change(float ccVal);
+    void wheel4Change(float ccVal);
+    void wheel67Change(float ccVal);
     void cc1Change(float ccVal);
     void cc2Change(float ccVal);
     void cc4Change(float ccVal);
     void cc67Change(float ccVal);
 
     // MIDI inputs
-    float pitchBendUp, pitchBendDown, modWheel;
+    float pitchBendUp, pitchBendDown, modWheel, wheel2, wheel4, wheel67;
 
     // MIDI outputs
     float cc1, cc2, cc4, cc67;
 
     // control matrix
-    ControlBitmap pbUp, pbDown, wheel;
-    int cc1In;
+    ControlBitmap pbUp, pbDown, wheel, ctrl2, ctrl4, ctrl67;
+    int cc1In, cc2In, cc4In, cc67In;
     int cc1Out, cc2Out, cc4Out, cc67Out;
     bool presetLoaded;
 
 private:
-    bool pbUpChanged, pbDownChanged, modWheelChanged;
+    bool pbUpChanged, pbDownChanged, modWheelChanged, wheel2Changed, wheel4Changed, wheel67Changed;
     bool cc1Changed, cc2Changed, cc4Changed, cc67Changed;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModMateAudioProcessor)

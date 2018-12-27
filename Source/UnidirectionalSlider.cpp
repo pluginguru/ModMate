@@ -30,6 +30,11 @@ void UnidirectionalSlider::paint (Graphics& g)
     g.drawRect(area);
 }
 
+void UnidirectionalSlider::mouseDown(const MouseEvent& evt)
+{
+    mouseDrag(evt);
+}
+
 void UnidirectionalSlider::mouseDrag(const MouseEvent& evt)
 {
     float fv = (getWidth() > getHeight())

@@ -14,20 +14,24 @@ ModMateAudioProcessor::ModMateAudioProcessor()
 #endif
 {
     pitchBendUp = pitchBendDown = modWheel = 0.0f;
+    wheel2 = wheel4 = wheel67 = 0.0f;
     cc1 = cc2 = cc4 = cc67 = 0.0f;
     pbUpChanged = pbDownChanged = modWheelChanged = false;
+    wheel2Changed = wheel4Changed = wheel67Changed = false;
     cc1Changed = cc2Changed = cc4Changed = cc67Changed = false;
     presetLoaded = false;
 
-    cc1In = 1;
-    cc1Out = 1;
-    cc2Out = 2;
-    cc4Out = 4;
-    cc67Out = 67;
+    cc1In = cc1Out = 1;
+    cc2In = cc2Out = 2;
+    cc4In = cc4Out = 4;
+    cc67In = cc67Out = 67;
 
     pbUp.byteValue = 0;
     pbDown.byteValue = 0;
     wheel.byteValue = 0;
+    ctrl2.byteValue = 0;
+    ctrl4.byteValue = 0;
+    ctrl67.byteValue = 0;
 }
 
 ModMateAudioProcessor::~ModMateAudioProcessor()
@@ -158,6 +162,33 @@ void ModMateAudioProcessor::modWheelChange(float ccVal)
     }
 }
 
+void ModMateAudioProcessor::wheel2Change(float ccVal)
+{
+    if (ccVal != wheel2)
+    {
+        wheel2 = ccVal;
+        wheel2Changed = true;
+    }
+}
+
+void ModMateAudioProcessor::wheel4Change(float ccVal)
+{
+    if (ccVal != wheel4)
+    {
+        wheel4 = ccVal;
+        wheel4Changed = true;
+    }
+}
+
+void ModMateAudioProcessor::wheel67Change(float ccVal)
+{
+    if (ccVal != wheel67)
+    {
+        wheel67 = ccVal;
+        wheel67Changed = true;
+    }
+}
+
 void ModMateAudioProcessor::cc1Change(float ccVal)
 {
     if (ccVal != cc1)
@@ -206,29 +237,66 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     float CC4 = cc4;
     float CC67 = cc67;
 
+    bool somethingChanged = false;
+
     if (pbUpChanged)
     {
         pbUpChanged = false;
         if (pbUp.byteValue != 0)
         {
             int cval = int(pitchBendUp * 127 + 0.5f);
-            if (pbUp.bits.cc1) midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
-            if (pbUp.bits.cc2) midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
-            if (pbUp.bits.cc4) midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
-            if (pbUp.bits.cc67) midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            if (pbUp.bits.cc1)
+            {
+                cc1 = pitchBendUp;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+            }
+            if (pbUp.bits.cc2)
+            {
+                cc2 = pitchBendUp;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+            }
+            if (pbUp.bits.cc4)
+            {
+                cc4 = pitchBendUp;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+            }
+            if (pbUp.bits.cc67)
+            {
+                cc67 = pitchBendUp;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            }
+            sendChangeMessage();
         }
         else midiOut.addEvent(MidiMessage::pitchWheel(1, 8192 + int(pitchBendUp * 8191)), 0);
     }
     if (pbDownChanged)
     {
+        somethingChanged = true;
         pbDownChanged = false;
         if (pbDown.byteValue != 0)
         {
             int cval = int(pitchBendDown * 127 + 0.5f);
-            if (pbDown.bits.cc1) midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
-            if (pbDown.bits.cc2) midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
-            if (pbDown.bits.cc4) midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
-            if (pbDown.bits.cc67) midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            if (pbDown.bits.cc1)
+            {
+                cc1 = pitchBendDown;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+            }
+            if (pbDown.bits.cc2)
+            {
+                cc2 = pitchBendDown;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+            }
+            if (pbDown.bits.cc4)
+            {
+                cc4 = pitchBendDown;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+            }
+            if (pbDown.bits.cc67)
+            {
+                cc67 = pitchBendDown;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            }
+            sendChangeMessage();
         }
         else midiOut.addEvent(MidiMessage::pitchWheel(1, 8192 - int(pitchBendDown * 8192)), 0);
     }
@@ -238,12 +306,119 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
         int cval = int(modWheel * 127 + 0.5f);
         if (wheel.byteValue != 0)
         {
-            if (wheel.bits.cc1) midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
-            if (wheel.bits.cc2) midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
-            if (wheel.bits.cc4) midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
-            if (wheel.bits.cc67) midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            if (wheel.bits.cc1)
+            {
+                cc1 = modWheel;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+            }
+            if (wheel.bits.cc2)
+            {
+                cc2 = modWheel;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+            }
+            if (wheel.bits.cc4)
+            {
+                cc4 = modWheel;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+            }
+            if (wheel.bits.cc67)
+            {
+                cc67 = modWheel;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            }
+            sendChangeMessage();
         }
         else midiOut.addEvent(MidiMessage::controllerEvent(1, cc1In, cval), 0);
+    }
+    if (wheel2Changed)
+    {
+        wheel2Changed = false;
+        int cval = int(wheel2 * 127 + 0.5f);
+        if (ctrl2.byteValue != 0)
+        {
+            if (ctrl2.bits.cc1)
+            {
+                cc1 = wheel2;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+            }
+            if (ctrl2.bits.cc2)
+            {
+                cc2 = wheel2;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+            }
+            if (ctrl2.bits.cc4)
+            {
+                cc4 = wheel2;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+            }
+            if (ctrl2.bits.cc67)
+            {
+                cc67 = wheel2;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            }
+            sendChangeMessage();
+        }
+        else midiOut.addEvent(MidiMessage::controllerEvent(1, cc2In, cval), 0);
+    }
+    if (wheel4Changed)
+    {
+        wheel4Changed = false;
+        int cval = int(wheel4 * 127 + 0.5f);
+        if (ctrl4.byteValue != 0)
+        {
+            if (ctrl4.bits.cc1)
+            {
+                cc1 = wheel4;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+            }
+            if (ctrl4.bits.cc2)
+            {
+                cc2 = wheel4;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+            }
+            if (ctrl4.bits.cc4)
+            {
+                cc4 = wheel4;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+            }
+            if (ctrl4.bits.cc67)
+            {
+                cc67 = wheel4;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            }
+            sendChangeMessage();
+        }
+        else midiOut.addEvent(MidiMessage::controllerEvent(1, cc4In, cval), 0);
+    }
+    if (wheel67Changed)
+    {
+        wheel67Changed = false;
+        int cval = int(wheel67 * 127 + 0.5f);
+        if (ctrl67.byteValue != 0)
+        {
+            if (ctrl67.bits.cc1)
+            {
+                cc1 = wheel67;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+            }
+            if (ctrl67.bits.cc2)
+            {
+                cc2 = wheel67;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+            }
+            if (ctrl67.bits.cc4)
+            {
+                cc4 = wheel67;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+            }
+            if (ctrl67.bits.cc67)
+            {
+                cc67 = wheel67;
+                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+            }
+            sendChangeMessage();
+        }
+        else midiOut.addEvent(MidiMessage::controllerEvent(1, cc67In, cval), 0);
     }
 
     if (cc1Changed)
@@ -271,7 +446,6 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     int samplePos;
     for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, samplePos);)
     {
-        bool somethingChanged = false;
         if (msg.isPitchWheel() && (pbDown.byteValue || pbUp.byteValue))
         {
             int pwv = msg.getPitchWheelValue();
@@ -353,6 +527,45 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             }
             else midiOut.addEvent(msg, samplePos);
         }
+        else if (msg.isControllerOfType(cc2In))
+        {
+            wheel2 = msg.getControllerValue() / 127.0f;
+            somethingChanged = true;
+            if (ctrl2.byteValue)
+            {
+                if (ctrl2.bits.cc1) CC1 = wheel2;
+                if (ctrl2.bits.cc2) CC2 = wheel2;
+                if (ctrl2.bits.cc4) CC4 = wheel2;
+                if (ctrl2.bits.cc67) CC67 = wheel2;
+            }
+            else midiOut.addEvent(msg, samplePos);
+        }
+        else if (msg.isControllerOfType(cc4In))
+        {
+            wheel4 = msg.getControllerValue() / 127.0f;
+            somethingChanged = true;
+            if (ctrl4.byteValue)
+            {
+                if (ctrl4.bits.cc1) CC1 = wheel4;
+                if (ctrl4.bits.cc2) CC2 = wheel4;
+                if (ctrl4.bits.cc4) CC4 = wheel4;
+                if (ctrl4.bits.cc67) CC67 = wheel4;
+            }
+            else midiOut.addEvent(msg, samplePos);
+        }
+        else if (msg.isControllerOfType(cc67In))
+        {
+            wheel67 = msg.getControllerValue() / 127.0f;
+            somethingChanged = true;
+            if (ctrl67.byteValue)
+            {
+                if (ctrl67.bits.cc1) CC1 = wheel67;
+                if (ctrl67.bits.cc2) CC2 = wheel67;
+                if (ctrl67.bits.cc4) CC4 = wheel67;
+                if (ctrl67.bits.cc67) CC67 = wheel67;
+            }
+            else midiOut.addEvent(msg, samplePos);
+        }
         else
         {
             // all other messages are passed through
@@ -400,10 +613,7 @@ bool ModMateAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* ModMateAudioProcessor::createEditor()
 {
-    ModMateAudioProcessorEditor* editor = new ModMateAudioProcessorEditor (*this);
-    //presetLoaded = true;
-    sendChangeMessage();
-    return editor;
+    return new ModMateAudioProcessorEditor(*this);
 }
 
 void ModMateAudioProcessor::getStateInformation (MemoryBlock& destData)
@@ -412,7 +622,13 @@ void ModMateAudioProcessor::getStateInformation (MemoryBlock& destData)
     xml.setAttribute("pbUpBits", pbUp.byteValue);
     xml.setAttribute("pbDownBits", pbDown.byteValue);
     xml.setAttribute("wheelBits", wheel.byteValue);
+    xml.setAttribute("ctrl2Bits", ctrl2.byteValue);
+    xml.setAttribute("ctrl3Bits", ctrl4.byteValue);
+    xml.setAttribute("ctrl4Bits", ctrl67.byteValue);
     xml.setAttribute("cc1In", cc1In);
+    xml.setAttribute("cc2In", cc2In);
+    xml.setAttribute("cc3In", cc4In);
+    xml.setAttribute("cc4In", cc67In);
     xml.setAttribute("cc1Out", cc1Out);
     xml.setAttribute("cc2Out", cc2Out);
     xml.setAttribute("cc3Out", cc4Out);
@@ -426,7 +642,13 @@ void ModMateAudioProcessor::setStateInformation (const void* data, int sizeInByt
     pbUp.byteValue = xml->getIntAttribute("pbUpBits", 0);
     pbDown.byteValue = xml->getIntAttribute("pbDownBits", 0);
     wheel.byteValue = xml->getIntAttribute("wheelBits", 0);
+    ctrl2.byteValue = xml->getIntAttribute("ctrl2Bits", 0);
+    ctrl4.byteValue = xml->getIntAttribute("ctrl3Bits", 0);
+    ctrl67.byteValue = xml->getIntAttribute("ctrl4Bits", 0);
     cc1In = xml->getIntAttribute("cc1In", 1);
+    cc2In = xml->getIntAttribute("cc2In", 2);
+    cc4In = xml->getIntAttribute("cc3In", 4);
+    cc67In = xml->getIntAttribute("cc4In", 67);
     cc1Out = xml->getIntAttribute("cc1Out", 1);
     cc2Out = xml->getIntAttribute("cc2Out", 2);
     cc4Out = xml->getIntAttribute("cc3Out", 4);
