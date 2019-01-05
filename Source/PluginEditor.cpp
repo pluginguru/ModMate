@@ -1,6 +1,26 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+void CCLabel::mouseDown(const MouseEvent& evt)
+{
+    if (evt.mods.isRightButtonDown())
+    {
+        PopupMenu menu;
+        for (int cn = 1; cn < 128; cn++)
+        {
+            const char* controllerName = MidiMessage::getControllerName(cn);
+            if (controllerName)
+                menu.addItem(cn, String(controllerName));
+        }
+        int id = menu.show();
+        if (id)
+        {
+            setText(String(id), NotificationType::sendNotification);
+        }
+    }
+    else Label::mouseDown(evt);
+}
+
 ModMateAudioProcessorEditor::ModMateAudioProcessorEditor(ModMateAudioProcessor& p)
     : AudioProcessorEditor(&p), processor(p)
     , aboutButton(String("aboutBtn"), DrawableButton::ButtonStyle::ImageFitted)

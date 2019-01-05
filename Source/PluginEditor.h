@@ -4,6 +4,12 @@
 #include "PluginProcessor.h"
 #include "UnidirectionalSlider.h"
 
+class CCLabel : public Label
+{
+public:
+    void mouseDown(const MouseEvent&) override;
+};
+
 class ModMateAudioProcessorEditor   : public AudioProcessorEditor
                                     , public ChangeListener
                                     , public Button::Listener
@@ -37,9 +43,10 @@ private:
 
     // Controls
     DrawableButton aboutButton;
-    Label pbUpLabel, pbDownLabel, modWheelLabel, wheel2Label, wheel4Label, wheel67Label;
+    Label pbUpLabel, pbDownLabel;
+    CCLabel modWheelLabel, wheel2Label, wheel4Label, wheel67Label;
     UnidirectionalSlider pbUpSlider, pbDownSlider, modWheelSlider, wheel2Slider, wheel4Slider, wheel67Slider;
-    Label cc1Label, cc2Label, cc4Label, cc67Label;
+    CCLabel cc1Label, cc2Label, cc4Label, cc67Label;
     UnidirectionalSlider cc1Slider, cc2Slider, cc4Slider, cc67Slider;
     ToggleButton pbUp_cc1Btn, pbUp_cc2Btn, pbUp_cc4Btn, pbUp_cc67Btn;
     ToggleButton pbDn_cc1Btn, pbDn_cc2Btn, pbDn_cc4Btn, pbDn_cc67Btn;
