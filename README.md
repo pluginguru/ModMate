@@ -46,7 +46,7 @@ Copy the appropriate *.dll* (VST2) or *.vst3* file to whatever folder your DAW u
 
 Note that ModMade is a *MIDI Effect plug-in*, which needs to be inserted so it processes the incoming MIDI data before it reaches any VSTi instrument plug-ins on the same track, unlike regular audio-effect plug-ins are connected to the VSTs' *outputs*.
 
-Windows DAWs all have different ways to set this up, and there are a few that don't support MIDI effects at all, so please check the manual for your specific DAW. In *Reaper*, you simply have to ensure that the ModMate comes first in whatever list of plug-ins you put on a track. Unfortunately, *Cubase* users are out of luck, as *Cubase* still does NOT support third-party MIDI plug-ins--only their own.
+Windows DAWs all have different ways to set this up, and there are a few that don't support MIDI effects at all, so please check the manual for your specific DAW. In *Reaper*, you simply have to ensure that the ModMate comes first in whatever list of plug-ins you put on a track. Unfortunately, *Cubase* users are out of luck, as *Cubase* still does NOT support third-party MIDI plug-ins; only their own.
 
 ## Acknowledgements
 
