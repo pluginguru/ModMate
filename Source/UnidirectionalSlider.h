@@ -12,7 +12,7 @@ public:
 	void paint(Graphics&) override;
     void mouseDown(const MouseEvent&) override;
     void mouseDrag(const MouseEvent&) override;
-    void mouseUp(const MouseEvent&) override;
+    //void mouseUp(const MouseEvent&) override;
 
 	// UnidirectionalSlider
 	void setValue(float v);

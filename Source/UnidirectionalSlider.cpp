@@ -50,13 +50,12 @@ void UnidirectionalSlider::mouseDrag(const MouseEvent& evt)
     }
 }
 
-void UnidirectionalSlider::mouseUp(const MouseEvent&)
-{
-    value = 0.0f;
-    repaint();
-    sendChangeMessage();
-}
-
+//void UnidirectionalSlider::mouseUp(const MouseEvent&)
+//{
+//    value = 0.0f;
+//    repaint();
+//    sendChangeMessage();
+//}
 
 void UnidirectionalSlider::setValue(float v)
 {
