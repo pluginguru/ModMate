@@ -21,7 +21,7 @@ If you don't check any of an input control's four destination boxes, the control
 If your DAW supports it, your selections on all the checkboxes can be saved as a preset, and will normally be saved automatically as part of the track settings in a saved project. This has been tested with the Mac AU version in *Logic Pro X* and with the VST version in [Reaper](https://www.reaper.fm/index.php) 64-bit.
 
 ## Advanced features
-You can **click/drag in any of the vertical indicators** on the left, and the plug-in will respond as though you had operated the corresponding input CC, and will generate CC output messages for whichever output CCs are checked for that input. You can also click/drag in any of the horizontal indicators on the right, and the plug-in will generate the corresponding output CC messages.
+You can **click/drag in any of the vertical indicators** on the left, and the plug-in will respond as though you had operated the corresponding input CC, and will generate CC output messages for whichever output CCs are checked for that input. You can also **click/drag in any of the horizontal indicators on the right**, and the plug-in will generate the corresponding output CC messages.
 
 You can **double-click any of the *colored* slider labels** (not *pbUp* or *pbDn*) to change the corresponding MIDI CC number. You may type any number between 1 and 127; you don't have to put "cc" at the start, but it's OK if you do. You must press *Enter* to confirm the change. Note CC#1 will always display as "modW" because MIDI CC #1 *is* the standard mod wheel. Alternatively, you can  **right-click any colored slider label** to choose the CC number from a list of standard controller names, e.g. "Breath Controller".
 
