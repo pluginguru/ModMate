@@ -52,7 +52,7 @@ Windows DAWs all have different ways to set this up, and there are a few that do
 
 ![](VST2LogoWhite.jpg "VST2 logo") ![](VST3LogoBlack.jpg "VST3 logo")
 
-*VST* and its expansion *Virtual Studio Technologies* are registered trade marks of [Steinberg Media Technologies GmbH](https://www.steinberg.net/) and are used under license.
+*VST* is a trademark and software of [Steinberg Media Technologies GmbH](https://www.steinberg.net/).
 
 ---
 
