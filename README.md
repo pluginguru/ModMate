@@ -1,5 +1,6 @@
 # MIDI Mod-Mate
 ![](modmate.png)
+
 This is a MIDI effect (can be inserted in the MIDI effects slot of Apple Logic Pro X) to provide a very basic MIDI "macro" capability.
 
 I developed this specifically for use with [Airwave V3 for Omnisphere](https://www.pluginguru.com/products/airwave-v3/), a pair of sound libraries for [Spectrasonics Omnisphere](https://www.spectrasonics.net/products/omnisphere/) developed by Belgian DJ and sound designer Laurent V&eacute;ronnez (aka *Airwave*) and John "Skippy" Lemkuhl aka [PlugInGuru.com](https://www.pluginguru.com/), which are unique in that four distinct MIDI CCs (continuous controllers) can be used to affect the sound in real-time:
