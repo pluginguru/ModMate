@@ -43,6 +43,12 @@ const String ModMateAudioProcessor::getName() const
     return JucePlugin_Name;
 }
 
+bool ModMateAudioProcessor::isVST() const
+{
+    return wrapperType == WrapperType::wrapperType_VST ||
+           wrapperType == WrapperType::wrapperType_VST3;
+}
+
 bool ModMateAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
@@ -248,22 +254,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             if (pbUp.bits.cc1)
             {
                 cc1 = pitchBendUp;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                if (cc1Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (pbUp.bits.cc2)
             {
                 cc2 = pitchBendUp;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                if (cc2Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (pbUp.bits.cc4)
             {
                 cc4 = pitchBendUp;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                if (cc4Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (pbUp.bits.cc67)
             {
                 cc67 = pitchBendUp;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                if (cc67Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             sendChangeMessage();
         }
@@ -279,22 +297,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             if (pbDown.bits.cc1)
             {
                 cc1 = pitchBendDown;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                if (cc1Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (pbDown.bits.cc2)
             {
                 cc2 = pitchBendDown;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                if (cc2Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (pbDown.bits.cc4)
             {
                 cc4 = pitchBendDown;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                if (cc4Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (pbDown.bits.cc67)
             {
                 cc67 = pitchBendDown;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                if (cc67Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             sendChangeMessage();
         }
@@ -309,22 +339,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             if (wheel.bits.cc1)
             {
                 cc1 = modWheel;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                if (cc1Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (wheel.bits.cc2)
             {
                 cc2 = modWheel;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                if (cc2Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (wheel.bits.cc4)
             {
                 cc4 = modWheel;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                if (cc4Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (wheel.bits.cc67)
             {
                 cc67 = modWheel;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                if (cc67Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             sendChangeMessage();
         }
@@ -339,22 +381,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             if (ctrl2.bits.cc1)
             {
                 cc1 = wheel2;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                if (cc1Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl2.bits.cc2)
             {
                 cc2 = wheel2;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                if (cc2Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl2.bits.cc4)
             {
                 cc4 = wheel2;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                if (cc4Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl2.bits.cc67)
             {
                 cc67 = wheel2;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                if (cc67Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             sendChangeMessage();
         }
@@ -369,22 +423,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             if (ctrl4.bits.cc1)
             {
                 cc1 = wheel4;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                if (cc1Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl4.bits.cc2)
             {
                 cc2 = wheel4;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                if (cc2Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl4.bits.cc4)
             {
                 cc4 = wheel4;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                if (cc4Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl4.bits.cc67)
             {
                 cc67 = wheel4;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                if (cc67Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             sendChangeMessage();
         }
@@ -399,22 +465,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             if (ctrl67.bits.cc1)
             {
                 cc1 = wheel67;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                if (cc1Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl67.bits.cc2)
             {
                 cc2 = wheel67;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                if (cc2Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl67.bits.cc4)
             {
                 cc4 = wheel67;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                if (cc4Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             if (ctrl67.bits.cc67)
             {
                 cc67 = wheel67;
-                midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                if (cc67Out < 128)
+                    midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, cval), 0);
+                else
+                    midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), 0);
             }
             sendChangeMessage();
         }
@@ -424,22 +502,34 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     if (cc1Changed)
     {
         cc1Changed = false;
-        midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, int(cc1 * 127)), 0);
+        if (cc1Out < 128)
+            midiOut.addEvent(MidiMessage::controllerEvent(1, cc1Out, int(cc1 * 127)), 0);
+        else
+            midiOut.addEvent(MidiMessage::channelPressureChange(1, int(cc1 * 127)), 0);
     }
     if (cc2Changed)
     {
         cc2Changed = false;
-        midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, int(cc2 * 127)), 0);
+        if (cc2Out < 128)
+            midiOut.addEvent(MidiMessage::controllerEvent(1, cc2Out, int(cc2 * 127)), 0);
+        else
+            midiOut.addEvent(MidiMessage::channelPressureChange(1, int(cc2 * 127)), 0);
     }
     if (cc4Changed)
     {
         cc4Changed = false;
-        midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, int(cc4 * 127)), 0);
+        if (cc4Out < 128)
+            midiOut.addEvent(MidiMessage::controllerEvent(1, cc4Out, int(cc4 * 127)), 0);
+        else
+            midiOut.addEvent(MidiMessage::channelPressureChange(1, int(cc4 * 127)), 0);
     }
     if (cc67Changed)
     {
         cc67Changed = false;
-        midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, int(cc67 * 127)), 0);
+        if (cc67Out < 128)
+            midiOut.addEvent(MidiMessage::controllerEvent(1, cc67Out, int(cc67 * 127)), 0);
+        else
+            midiOut.addEvent(MidiMessage::channelPressureChange(1, int(cc67 * 127)), 0);
     }
 
     MidiMessage msg;
@@ -458,25 +548,37 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
                 {
                     if (pbDown.bits.cc1)
                     {
-                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc1Out, 0), samplePos);
+                        if (cc1Out < 128)
+                            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc1Out, 0), samplePos);
+                        else
+                            midiOut.addEvent(MidiMessage::channelPressureChange(1, 0), samplePos);
                         CC1 = 0.0f;
                         somethingChanged = true;
                     }
                     if (pbDown.bits.cc2)
                     {
-                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc2Out, 0), samplePos);
+                        if (cc2Out < 128)
+                            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc2Out, 0), samplePos);
+                        else
+                            midiOut.addEvent(MidiMessage::channelPressureChange(1, 0), samplePos);
                         CC2 = 0.0f;
                         somethingChanged = true;
                     }
                     if (pbDown.bits.cc4)
                     {
-                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc4Out, 0), samplePos);
+                        if (cc4Out < 128)
+                            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc4Out, 0), samplePos);
+                        else
+                            midiOut.addEvent(MidiMessage::channelPressureChange(1, 0), samplePos);
                         CC4 = 0.0f;
                         somethingChanged = true;
                     }
                     if (pbDown.bits.cc67)
                     {
-                        midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc67Out, 0), samplePos);
+                        if (cc67Out < 128)
+                            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc67Out, 0), samplePos);
+                        else
+                            midiOut.addEvent(MidiMessage::channelPressureChange(1, 0), samplePos);
                         CC67 = 0.0f;
                         somethingChanged = true;
                     }
@@ -514,9 +616,9 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             somethingChanged = true;
             midiOut.addEvent(msg, samplePos);
         }
-        else if (msg.isControllerOfType(cc1In))
+        else if ((cc1In == 128 && msg.isChannelPressure()) || msg.isControllerOfType(cc1In))
         {
-            modWheel = msg.getControllerValue() / 127.0f;
+            modWheel = ((cc1In == 128) ? msg.getChannelPressureValue() : msg.getControllerValue()) / 127.0f;
             somethingChanged = true;
             if (wheel.byteValue)
             {
@@ -527,9 +629,9 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             }
             else midiOut.addEvent(msg, samplePos);
         }
-        else if (msg.isControllerOfType(cc2In))
+        else if ((cc2In == 128 && msg.isChannelPressure()) || msg.isControllerOfType(cc2In))
         {
-            wheel2 = msg.getControllerValue() / 127.0f;
+            wheel2 = ((cc2In == 128) ? msg.getChannelPressureValue() : msg.getControllerValue()) / 127.0f;
             somethingChanged = true;
             if (ctrl2.byteValue)
             {
@@ -540,9 +642,9 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             }
             else midiOut.addEvent(msg, samplePos);
         }
-        else if (msg.isControllerOfType(cc4In))
+        else if ((cc4In == 128 && msg.isChannelPressure()) || msg.isControllerOfType(cc4In))
         {
-            wheel4 = msg.getControllerValue() / 127.0f;
+            wheel4 = ((cc4In == 128) ? msg.getChannelPressureValue() : msg.getControllerValue()) / 127.0f;
             somethingChanged = true;
             if (ctrl4.byteValue)
             {
@@ -553,9 +655,9 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             }
             else midiOut.addEvent(msg, samplePos);
         }
-        else if (msg.isControllerOfType(cc67In))
+        else if ((cc67In == 128 && msg.isChannelPressure()) || msg.isControllerOfType(cc67In))
         {
-            wheel67 = msg.getControllerValue() / 127.0f;
+            wheel67 = ((cc67In == 128) ? msg.getChannelPressureValue() : msg.getControllerValue()) / 127.0f;
             somethingChanged = true;
             if (ctrl67.byteValue)
             {
@@ -576,28 +678,40 @@ void ModMateAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
         {
             cc1 = CC1;
             int cval = int(cc1 * 127 + 0.5f);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc1Out, cval), samplePos);
+            if (cc1Out < 128)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc1Out, cval), samplePos);
+            else
+                midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), samplePos);
             somethingChanged = true;
         }
         if (CC2 != cc2)
         {
             cc2 = CC2;
             int cval = int(cc2 * 127 + 0.5f);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc2Out, cval), samplePos);
+            if (cc2Out < 128)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc2Out, cval), samplePos);
+            else
+                midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), samplePos);
             somethingChanged = true;
         }
         if (CC4 != cc4)
         {
             cc4 = CC4;
             int cval = int(cc4 * 127 + 0.5f);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc4Out, cval), samplePos);
+            if (cc4Out < 128)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc4Out, cval), samplePos);
+            else
+                midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), samplePos);
             somethingChanged = true;
         }
         if (CC67 != cc67)
         {
             cc67 = CC67;
             int cval = int(cc67 * 127 + 0.5f);
-            midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc67Out, cval), samplePos);
+            if (cc67Out < 128)
+                midiOut.addEvent(MidiMessage::controllerEvent(msg.getChannel(), cc67Out, cval), samplePos);
+            else
+                midiOut.addEvent(MidiMessage::channelPressureChange(1, cval), samplePos);
             somethingChanged = true;
         }
         if (somethingChanged) sendChangeMessage();

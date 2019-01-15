@@ -6,8 +6,14 @@
 
 class CCLabel : public Label
 {
+private:
+    int& ccVar;
+
 public:
+    CCLabel(int& ccVarRef, const Colour& colour, const Justification justification);
+
     void mouseDown(const MouseEvent&) override;
+    void textWasChanged() override;
 };
 
 class ModMateAudioProcessorEditor   : public AudioProcessorEditor
@@ -21,22 +27,13 @@ public:
     // Component
     void paint(Graphics&) override;
     void resized() override;
+    void mouseDown(const MouseEvent&) override;
 
     // ChangeListener
     void changeListenerCallback(ChangeBroadcaster*) override;
     
     // Button::Listener
     void buttonClicked(Button*) override;
-
-protected:
-    void onModWheelLabelTextChange();
-    void onWheel2LabelTextChange();
-    void onWheel4LabelTextChange();
-    void onWheel67LabelTextChange();
-    void onCC1LabelTextChange();
-    void onCC2LabelTextChange();
-    void onCC4LabelTextChange();
-    void onCC67LabelTextChange();
 
 private:
     ModMateAudioProcessor& processor;

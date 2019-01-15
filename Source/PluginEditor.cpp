@@ -1,88 +1,103 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+CCLabel::CCLabel(int& ccVarRef, const Colour& colour, const Justification justification)
+    : ccVar(ccVarRef)
+{
+    setColour(Label::textColourId, colour);
+    setJustificationType(justification);
+    setText("-1", NotificationType::sendNotification);
+    setEditable(false, true, true);
+}
+
 void CCLabel::mouseDown(const MouseEvent& evt)
 {
-    if (evt.mods.isRightButtonDown())
+    if (evt.mods.isRightButtonDown() || evt.mods.isCtrlDown())
     {
         PopupMenu menu;
-        for (int cn = 1; cn < 128; cn++)
+        for (int cn = 0; cn < 128; cn++)
         {
+            String controllerNameString = "CC" + String(cn);
             const char* controllerName = MidiMessage::getControllerName(cn);
             if (controllerName)
-                menu.addItem(cn, String(controllerName));
+                controllerNameString += " " + String(controllerName);
+            menu.addItem(cn + 1, controllerNameString);
         }
+        menu.addItem(129, "Channel Pressure (mono aftertouch)");
         int id = menu.show();
         if (id)
         {
-            setText(String(id), NotificationType::sendNotification);
+            setText(String(id - 1), NotificationType::sendNotification);
         }
     }
     else Label::mouseDown(evt);
 }
 
+void CCLabel::textWasChanged()
+{
+    String newValueStr = getText();
+    if (newValueStr.toLowerCase() == "at")
+    {
+        setText("AT", NotificationType::dontSendNotification);
+        ccVar = 128;
+    }
+    else
+    {
+        int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
+        if (newCC >= 0 && newCC <= 128) ccVar = newCC;
+        else newCC = ccVar;
+        String lblText(newCC == 128 ? "AT" : "cc" + String(newCC));
+        setText(lblText, NotificationType::dontSendNotification);
+    }
+}
+
 ModMateAudioProcessorEditor::ModMateAudioProcessorEditor(ModMateAudioProcessor& p)
     : AudioProcessorEditor(&p), processor(p)
     , aboutButton(String("aboutBtn"), DrawableButton::ButtonStyle::ImageFitted)
+    , modWheelLabel(p.cc1In, Colours::hotpink, Justification::bottomLeft)
+    , wheel2Label(p.cc2In, Colours::greenyellow, Justification::bottomLeft)
+    , wheel4Label(p.cc4In, Colours::cyan, Justification::bottomLeft)
+    , wheel67Label(p.cc67In, Colours::darkorange, Justification::bottomLeft)
     , pbUpSlider(Colours::lime)
     , pbDownSlider(Colours::red)
-    , modWheelSlider(Colours::darkorange)
-    , wheel2Slider(Colours::hotpink)
+    , modWheelSlider(Colours::hotpink)
+    , wheel2Slider(Colours::greenyellow)
     , wheel4Slider(Colours::cyan)
-    , wheel67Slider(Colours::greenyellow)
-    , cc1Slider(Colours::darkorange)
-    , cc2Slider(Colours::hotpink)
+    , wheel67Slider(Colours::darkorange)
+    , cc1Label(p.cc1Out, Colours::hotpink, Justification::centredRight)
+    , cc2Label(p.cc2Out, Colours::greenyellow, Justification::centredRight)
+    , cc4Label(p.cc4Out, Colours::cyan, Justification::centredRight)
+    , cc67Label(p.cc67Out, Colours::darkorange, Justification::centredRight)
+    , cc1Slider(Colours::hotpink)
+    , cc2Slider(Colours::greenyellow)
     , cc4Slider(Colours::cyan)
-    , cc67Slider(Colours::greenyellow)
+    , cc67Slider(Colours::darkorange)
 {
     std::unique_ptr<Drawable> icon(Drawable::createFromImageData(BinaryData::help_svg, BinaryData::help_svgSize));
     icon->replaceColour(Colours::black, Colours::aliceblue);
     aboutButton.setImages(icon.get());
     addAndMakeVisible(aboutButton);
     aboutButton.onClick = [this] {
+#ifdef BRANDED_VERSION
+        URL url(BRANDED_INFO_URL);
+#else
         URL url("https://github.com/getdunne/modmate");
+#endif
         url.launchInDefaultBrowser();
     };
 
     addAndMakeVisible(pbUpLabel);
-    pbUpLabel.setJustificationType(Justification::left);
+    pbUpLabel.setJustificationType(Justification::bottomLeft);
     pbUpLabel.setText("pbUp", NotificationType::dontSendNotification);
 
     addAndMakeVisible(pbDownLabel);
-    pbDownLabel.setJustificationType(Justification::left);
+    pbDownLabel.setJustificationType(Justification::bottomLeft);
     pbDownLabel.setText("pbDn", NotificationType::dontSendNotification);
 
     addAndMakeVisible(modWheelLabel);
-    modWheelLabel.setColour(Label::textColourId, Colours::darkorange);
-    modWheelLabel.setJustificationType(Justification::left);
-    String lblText(processor.cc1In == 1 ? "modW" : "cc" + String(processor.cc1In));
-    modWheelLabel.setText(lblText, NotificationType::dontSendNotification);
-    modWheelLabel.setEditable(false, true, true);
-    modWheelLabel.onTextChange = [this] { onModWheelLabelTextChange(); };
-
     addAndMakeVisible(wheel2Label);
-    wheel2Label.setColour(Label::textColourId, Colours::hotpink);
-    wheel2Label.setJustificationType(Justification::left);
-    lblText = processor.cc2In == 1 ? "modW" : "cc" + String(processor.cc2In);
-    wheel2Label.setText(lblText, NotificationType::dontSendNotification);
-    wheel2Label.setEditable(false, true, true);
-    wheel2Label.onTextChange = [this] { onWheel2LabelTextChange(); };
-
     addAndMakeVisible(wheel4Label);
-    wheel4Label.setColour(Label::textColourId, Colours::cyan);
-    wheel4Label.setJustificationType(Justification::left);
-    lblText = processor.cc4In == 1 ? "modW" : "cc" + String(processor.cc4In);
-    wheel4Label.setText(lblText, NotificationType::dontSendNotification);
-    wheel4Label.setEditable(false, true, true);
-    wheel4Label.onTextChange = [this] { onWheel4LabelTextChange(); };
-
     addAndMakeVisible(wheel67Label);
-    wheel67Label.setColour(Label::textColourId, Colours::greenyellow);
-    wheel67Label.setJustificationType(Justification::left);
-    lblText = processor.cc67In == 1 ? "modW" : "cc" + String(processor.cc67In);
-    wheel67Label.setText(lblText, NotificationType::dontSendNotification);
-    wheel67Label.setEditable(false, true, true);
-    wheel67Label.onTextChange = [this] { onWheel67LabelTextChange(); };
 
     addAndMakeVisible(pbUpSlider);
     addAndMakeVisible(pbDownSlider);
@@ -92,36 +107,9 @@ ModMateAudioProcessorEditor::ModMateAudioProcessorEditor(ModMateAudioProcessor& 
     addAndMakeVisible(wheel67Slider);
 
     addAndMakeVisible(cc1Label);
-    cc1Label.setJustificationType(Justification::centredRight);
-    cc1Label.setColour(Label::textColourId, Colours::darkorange);
-    lblText = processor.cc1Out == 1 ? "modW" : "cc" + String(processor.cc1Out);
-    cc1Label.setText(lblText, NotificationType::dontSendNotification);
-    cc1Label.setEditable(false, true, true);
-    cc1Label.onTextChange = [this] { onCC1LabelTextChange(); };
-
     addAndMakeVisible(cc2Label);
-    cc2Label.setJustificationType(Justification::centredRight);
-    cc2Label.setColour(Label::textColourId, Colours::hotpink);
-    lblText = processor.cc2Out == 1 ? "modW" : "cc" + String(processor.cc2Out);
-    cc2Label.setText(lblText, NotificationType::dontSendNotification);
-    cc2Label.setEditable(false, true, true);
-    cc2Label.onTextChange = [this] { onCC2LabelTextChange(); };
-
     addAndMakeVisible(cc4Label);
-    cc4Label.setJustificationType(Justification::centredRight);
-    cc4Label.setColour(Label::textColourId, Colours::cyan);
-    lblText = processor.cc4Out == 1 ? "modW" : "cc" + String(processor.cc4Out);
-    cc4Label.setText(lblText, NotificationType::dontSendNotification);
-    cc4Label.setEditable(false, true, true);
-    cc4Label.onTextChange = [this] { onCC4LabelTextChange(); };
-
     addAndMakeVisible(cc67Label);
-    cc67Label.setJustificationType(Justification::centredRight);
-    cc67Label.setColour(Label::textColourId, Colours::greenyellow);
-    lblText = processor.cc67Out == 1 ? "modW" : "cc" + String(processor.cc67Out);
-    cc67Label.setText(lblText, NotificationType::dontSendNotification);
-    cc67Label.setEditable(false, true, true);
-    cc67Label.onTextChange = [this] { onCC67LabelTextChange(); };
 
     addAndMakeVisible(cc1Slider);
     addAndMakeVisible(cc2Slider);
@@ -209,7 +197,11 @@ ModMateAudioProcessorEditor::ModMateAudioProcessorEditor(ModMateAudioProcessor& 
     wh67_cc4Btn.addListener(this);
     wh67_cc67Btn.addListener(this);
 
-    setSize (650, 300);
+#ifdef BRANDED_VERSION
+    setSize(722, 288);
+#else
+    setSize(650, 288);
+#endif
 }
 
 ModMateAudioProcessorEditor::~ModMateAudioProcessorEditor()
@@ -219,19 +211,37 @@ ModMateAudioProcessorEditor::~ModMateAudioProcessorEditor()
 
 void ModMateAudioProcessorEditor::paint (Graphics& g)
 {
+#ifdef BRANDED_VERSION
+    Image background = ImageCache::getFromMemory(BinaryData::Background_png, BinaryData::Background_pngSize);
+    g.drawImageAt(background, 0, 0);
+
+    if (processor.isVST())
+    {
+        g.setColour(Colours::lightgrey);
+        g.setFont(10);
+        g.drawText("VST PlugIn Technology by Steinberg Media Technologies",
+                   Rectangle<float>(440, 12, 250, 10), Justification::left);
+    }
+#else
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+#endif
 }
 
 void ModMateAudioProcessorEditor::resized()
 {
-    auto aboutBox = getLocalBounds().reduced(6).removeFromTop(24).removeFromRight(24);
+    auto aboutBox = getLocalBounds().reduced(2).removeFromTop(24).removeFromRight(24);
     aboutButton.setBounds(aboutBox);
 
-    auto bounds = getLocalBounds().reduced(10);
+    auto bounds = getLocalBounds().reduced(10, 0);
+#ifdef BRANDED_VERSION
+    bounds.removeFromLeft(72);
+#endif
+
     auto column = bounds.removeFromLeft(50);
-    pbUpLabel.setBounds(column.removeFromTop(20).withX(column.getX() - 8));
-    pbUpSlider.setBounds(column.removeFromLeft(20));
+    pbUpLabel.setBounds(column.removeFromTop(26).withX(column.getX() - 8));
+    column.removeFromTop(2);
+    pbUpSlider.setBounds(column.removeFromLeft(20).reduced(0, 6));
     int colHeight = column.getHeight();
     pbUp_cc1Btn.setBounds(column.removeFromTop(colHeight / 4));
     pbUp_cc2Btn.setBounds(column.removeFromTop(colHeight / 4));
@@ -239,53 +249,58 @@ void ModMateAudioProcessorEditor::resized()
     pbUp_cc67Btn.setBounds(column);
 
     column = bounds.removeFromLeft(50);
-    pbDownLabel.setBounds(column.removeFromTop(20).withX(column.getX() - 8));
-    pbDownSlider.setBounds(column.removeFromLeft(20));
+    pbDownLabel.setBounds(column.removeFromTop(26).withX(column.getX() - 8));
+    column.removeFromTop(2);
+    pbDownSlider.setBounds(column.removeFromLeft(20).reduced(0, 6));
     pbDn_cc1Btn.setBounds(column.removeFromTop(colHeight / 4));
     pbDn_cc2Btn.setBounds(column.removeFromTop(colHeight / 4));
     pbDn_cc4Btn.setBounds(column.removeFromTop(colHeight / 4));
     pbDn_cc67Btn.setBounds(column);
 
     column = bounds.removeFromLeft(50);
-    modWheelLabel.setBounds(column.removeFromTop(20).withX(column.getX() - 8));
-    modWheelSlider.setBounds(column.removeFromLeft(20));
+    modWheelLabel.setBounds(column.removeFromTop(26).withX(column.getX() - 8));
+    column.removeFromTop(2);
+    modWheelSlider.setBounds(column.removeFromLeft(20).reduced(0, 6));
     modW_cc1Btn.setBounds(column.removeFromTop(colHeight / 4));
     modW_cc2Btn.setBounds(column.removeFromTop(colHeight / 4));
     modW_cc4Btn.setBounds(column.removeFromTop(colHeight / 4));
     modW_cc67Btn.setBounds(column);
 
     column = bounds.removeFromLeft(50);
-    wheel2Label.setBounds(column.removeFromTop(20).withX(column.getX() - 8));
-    wheel2Slider.setBounds(column.removeFromLeft(20));
+    wheel2Label.setBounds(column.removeFromTop(26).withX(column.getX() - 8));
+    column.removeFromTop(2);
+    wheel2Slider.setBounds(column.removeFromLeft(20).reduced(0, 6));
     wh2_cc1Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh2_cc2Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh2_cc4Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh2_cc67Btn.setBounds(column);
 
     column = bounds.removeFromLeft(50);
-    wheel4Label.setBounds(column.removeFromTop(20).withX(column.getX() - 8));
-    wheel4Slider.setBounds(column.removeFromLeft(20));
+    wheel4Label.setBounds(column.removeFromTop(26).withX(column.getX() - 8));
+    column.removeFromTop(2);
+    wheel4Slider.setBounds(column.removeFromLeft(20).reduced(0, 6));
     wh4_cc1Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh4_cc2Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh4_cc4Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh4_cc67Btn.setBounds(column);
 
     column = bounds.removeFromLeft(50);
-    wheel67Label.setBounds(column.removeFromTop(20).withX(column.getX() - 8));
-    wheel67Slider.setBounds(column.removeFromLeft(20));
+    wheel67Label.setBounds(column.removeFromTop(26).withX(column.getX() - 8));
+    column.removeFromTop(2);
+    wheel67Slider.setBounds(column.removeFromLeft(20).reduced(0, 6));
     wh67_cc1Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh67_cc2Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh67_cc4Btn.setBounds(column.removeFromTop(colHeight / 4));
     wh67_cc67Btn.setBounds(column);
 
     column = bounds.removeFromLeft(50);
-    column.removeFromTop(20);
+    column.removeFromTop(28);
     cc1Label.setBounds(column.removeFromTop(colHeight / 4));
     cc2Label.setBounds(column.removeFromTop(colHeight / 4));
     cc4Label.setBounds(column.removeFromTop(colHeight / 4));
     cc67Label.setBounds(column);
 
-    bounds.removeFromTop(20);
+    bounds.removeFromTop(28);
     auto row = bounds.removeFromTop(colHeight / 4); row.reduce(0, 8);
     cc1Slider.setBounds(row);
     row = bounds.removeFromTop(colHeight / 4); row.reduce(0, 8);
@@ -294,6 +309,17 @@ void ModMateAudioProcessorEditor::resized()
     cc4Slider.setBounds(row);
     row = bounds; row.reduce(0, 8);
     cc67Slider.setBounds(row);
+}
+
+void ModMateAudioProcessorEditor::mouseDown(const MouseEvent& evt)
+{
+#ifdef BRANDED_VERSION
+    if (evt.getPosition().getX() < 72 && evt.getPosition().getY() < 72)
+    {
+        URL url(BRANDING_URL);
+        url.launchInDefaultBrowser();
+    }
+#endif
 }
 
 void ModMateAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* sender)
@@ -350,19 +376,6 @@ void ModMateAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* send
     }
     else  // sender is nullptr (called on creation) or &processor
     {
-        if (sender == nullptr || processor.presetLoaded)
-        {
-            String lblText(processor.cc1In == 1 ? "modW" : "cc" + String(processor.cc1In));
-            modWheelLabel.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc1Out == 1 ? "modW" : "cc" + String(processor.cc1Out);
-            cc1Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc2Out == 1 ? "modW" : "cc" + String(processor.cc2Out);
-            cc2Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc4Out == 1 ? "modW" : "cc" + String(processor.cc4Out);
-            cc4Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc67Out == 1 ? "modW" : "cc" + String(processor.cc67Out);
-            cc67Label.setText(lblText, NotificationType::dontSendNotification);
-        }
         if (pitchBendUp != processor.pitchBendUp)
         {
             pitchBendUp = processor.pitchBendUp;
@@ -461,26 +474,18 @@ void ModMateAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* send
             wh67_cc4Btn.setToggleState(ctrl67.bits.cc4, NotificationType::dontSendNotification);
             wh67_cc67Btn.setToggleState(ctrl67.bits.cc67, NotificationType::dontSendNotification);
         }
-        if (sender != nullptr || processor.presetLoaded)
+        if (processor.presetLoaded)
         {
-            String lblText = processor.cc1In == 1 ? "modW" : "cc" + String(processor.cc1In);
-            modWheelLabel.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc2In == 1 ? "modW" : "cc" + String(processor.cc2In);
-            wheel2Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc4In == 1 ? "modW" : "cc" + String(processor.cc4In);
-            wheel4Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc67In == 1 ? "modW" : "cc" + String(processor.cc67In);
-            wheel67Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc1Out == 1 ? "modW" : "cc" + String(processor.cc1Out);
-            cc1Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc2Out == 1 ? "modW" : "cc" + String(processor.cc2Out);
-            cc2Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc4Out == 1 ? "modW" : "cc" + String(processor.cc4Out);
-            cc4Label.setText(lblText, NotificationType::dontSendNotification);
-            lblText = processor.cc67Out == 1 ? "modW" : "cc" + String(processor.cc67Out);
-            cc67Label.setText(lblText, NotificationType::dontSendNotification);
+            modWheelLabel.setText("-1", NotificationType::sendNotification);
+            wheel2Label.setText("-1", NotificationType::sendNotification);
+            wheel4Label.setText("-1", NotificationType::sendNotification);
+            wheel67Label.setText("-1", NotificationType::sendNotification);
+            cc1Label.setText("-1", NotificationType::sendNotification);
+            cc2Label.setText("-1", NotificationType::sendNotification);
+            cc4Label.setText("-1", NotificationType::sendNotification);
+            cc67Label.setText("-1", NotificationType::sendNotification);
+            processor.presetLoaded = false;
         }
-        processor.presetLoaded = false;
     }
 }
 
@@ -515,92 +520,4 @@ void ModMateAudioProcessorEditor::buttonClicked(Button* button)
     if (button == &wh67_cc2Btn) ctrl67.bits.cc2 = processor.ctrl67.bits.cc2 = button->getToggleState();
     if (button == &wh67_cc4Btn) ctrl67.bits.cc4 = processor.ctrl67.bits.cc4 = button->getToggleState();
     if (button == &wh67_cc67Btn) ctrl67.bits.cc67 = processor.ctrl67.bits.cc67 = button->getToggleState();
-}
-
-void ModMateAudioProcessorEditor::onModWheelLabelTextChange()
-{
-    String newValueStr = modWheelLabel.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc1In = newCC;
-    else newCC = processor.cc1In;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    modWheelLabel.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onWheel2LabelTextChange()
-{
-    String newValueStr = wheel2Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc2In = newCC;
-    else newCC = processor.cc2In;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    wheel2Label.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onWheel4LabelTextChange()
-{
-    String newValueStr = wheel4Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc4In = newCC;
-    else newCC = processor.cc4In;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    wheel4Label.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onWheel67LabelTextChange()
-{
-    String newValueStr = wheel67Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc67In = newCC;
-    else newCC = processor.cc67In;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    wheel67Label.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onCC1LabelTextChange()
-{
-    String newValueStr = cc1Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc1Out = newCC;
-    else newCC = processor.cc1Out;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    cc1Label.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onCC2LabelTextChange()
-{
-    String newValueStr = cc2Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc2Out = newCC;
-    else newCC = processor.cc2Out;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    cc2Label.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onCC4LabelTextChange()
-{
-    String newValueStr = cc4Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc4Out = newCC;
-    else newCC = processor.cc4Out;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    cc4Label.setText(lblText, NotificationType::dontSendNotification);
-}
-
-void ModMateAudioProcessorEditor::onCC67LabelTextChange()
-{
-    String newValueStr = cc67Label.getText();
-    int newCC = newValueStr.trimCharactersAtStart("cC").getIntValue();
-    if (newValueStr.toUpperCase().startsWith("M")) newCC = 1;
-    if (newCC > 0 && newCC < 128) processor.cc67Out = newCC;
-    else newCC = processor.cc67Out;
-    String lblText(newCC == 1 ? "modW" : "cc" + String(newCC));
-    cc67Label.setText(lblText, NotificationType::dontSendNotification);
 }

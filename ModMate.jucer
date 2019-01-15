@@ -5,7 +5,7 @@
               bundleIdentifier="com.getdunne.ModMate" pluginFormats="buildAU,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginDesc="Midi CC macro plugin" pluginManufacturerCode="DunA"
-              pluginCode="ModM" version="1.1.0">
+              pluginCode="ModM" version="2.3.0">
   <MAINGROUP id="L9muth" name="ModMate">
     <GROUP id="{85081013-E4D9-CF97-EDAE-D152456D7973}" name="Assets">
       <FILE id="zHUSB2" name="help.svg" compile="0" resource="1" file="Assets/help.svg"/>

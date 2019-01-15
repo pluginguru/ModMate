@@ -36,6 +36,8 @@ public:
 
     const String getName() const override;
 
+    bool isVST() const;
+
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool isMidiEffect() const override;
